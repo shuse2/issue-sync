@@ -11,6 +11,8 @@ require (
 	github.com/google/go-github v8.0.1-0.20170711160406-00874eae3fbf+incompatible
 	github.com/spf13/cobra v0.0.0-20170716104802-d994347edadc
 	github.com/spf13/viper v0.0.0-20170619124313-c1de95864d73
+	github.com/writeas/go-strip-markdown v2.0.1+incompatible
+	gitlab.com/golang-commonmark/markdown v0.0.0-20211110145824-bf3e522c626a
 	golang.org/x/crypto v0.0.0-20170808112155-b176d7def5d7
 	golang.org/x/oauth2 v0.0.0-20170629190718-cce311a261e6
 )
@@ -32,10 +34,14 @@ require (
 	github.com/spf13/pflag v1.0.0 // indirect
 	github.com/stretchr/testify v1.7.1 // indirect
 	github.com/trivago/tgo v0.0.0-20170714134939-8a6fc6a04f07 // indirect
+	gitlab.com/golang-commonmark/html v0.0.0-20191124015941-a22733972181 // indirect
+	gitlab.com/golang-commonmark/linkify v0.0.0-20191026162114-a0c2df6c8f82 // indirect
+	gitlab.com/golang-commonmark/mdurl v0.0.0-20191124015652-932350d1cb84 // indirect
+	gitlab.com/golang-commonmark/puny v0.0.0-20191124015043-9f83538fa04f // indirect
 	golang.org/x/net v0.0.0-20170716174642-b3756b4b77d7 // indirect
 	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29 // indirect
 	golang.org/x/sys v0.0.0-20170714160439-4cd6d1a821c7 // indirect
-	golang.org/x/text v0.0.0-20170714085652-836efe42bb4a // indirect
+	golang.org/x/text v0.3.2 // indirect
 	google.golang.org/appengine v1.0.1-0.20170707203349-ad2570cd3913 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.0.0-20170713201520-3b4ad1db5b2a // indirect

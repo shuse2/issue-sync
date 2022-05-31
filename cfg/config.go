@@ -30,22 +30,26 @@ const defaultLogLevel = logrus.InfoLevel
 type fieldKey int
 
 const (
-	GitHubID       fieldKey = iota
-	GitHubNumber   fieldKey = iota
-	GitHubLabels   fieldKey = iota
-	GitHubStatus   fieldKey = iota
-	GitHubReporter fieldKey = iota
-	LastISUpdate   fieldKey = iota
+	GitHubID         fieldKey = iota
+	GitHubNumber     fieldKey = iota
+	GitHubLabels     fieldKey = iota
+	GitHubStatus     fieldKey = iota
+	GitHubReporter   fieldKey = iota
+	LastISUpdate     fieldKey = iota
+	GitHubRepository fieldKey = iota
+	GitHubURL        fieldKey = iota
 )
 
 // fields represents the custom field IDs of the JIRA custom fields we care about
 type fields struct {
-	githubID       string
-	githubNumber   string
-	githubLabels   string
-	githubReporter string
-	githubStatus   string
-	lastUpdate     string
+	githubID         string
+	githubNumber     string
+	githubLabels     string
+	githubReporter   string
+	githubStatus     string
+	lastUpdate       string
+	githubRepository string
+	githubURL        string
 }
 
 // Config is the root configuration object the application creates.
@@ -185,6 +189,10 @@ func (c Config) GetFieldID(key fieldKey) string {
 		return c.fieldIDs.githubStatus
 	case LastISUpdate:
 		return c.fieldIDs.lastUpdate
+	case GitHubRepository:
+		return c.fieldIDs.githubRepository
+	case GitHubURL:
+		return c.fieldIDs.githubURL
 	default:
 		return ""
 	}
@@ -478,6 +486,10 @@ func (c Config) getFieldIDs(client jira.Client) (fields, error) {
 			fieldIDs.githubReporter = fmt.Sprint(field.Schema.CustomID)
 		case "Last Issue-Sync Update":
 			fieldIDs.lastUpdate = fmt.Sprint(field.Schema.CustomID)
+		case "GitHub Repository":
+			fieldIDs.githubRepository = fmt.Sprint(field.Schema.CustomID)
+		case "GitHub URL":
+			fieldIDs.githubURL = fmt.Sprint(field.Schema.CustomID)
 		}
 	}
 
@@ -493,6 +505,10 @@ func (c Config) getFieldIDs(client jira.Client) (fields, error) {
 		return fieldIDs, errors.New("could not find ID of 'Github Reporter' custom field; check that it is named correctly")
 	} else if fieldIDs.lastUpdate == "" {
 		return fieldIDs, errors.New("could not find ID of 'Last Issue-Sync Update' custom field; check that it is named correctly")
+	} else if fieldIDs.githubRepository == "" {
+		return fieldIDs, errors.New("could not find ID of 'Github Repository' custom field; check that it is named correctly")
+	} else if fieldIDs.githubURL == "" {
+		return fieldIDs, errors.New("could not find ID of 'Github URL' custom field; check that it is named correctly")
 	}
 
 	c.log.Debug("All fields have been checked.")

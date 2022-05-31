@@ -88,9 +88,7 @@ func UpdateComment(config cfg.Config, ghComment github.IssueComment, jComment ji
 
 	// fields[0] is the whole body, 1 is the ID, 2 is the username, 3 is the real name (or "" if none)
 	// 4 is the date, and 5 is the real body
-	fields := jCommentRegex.FindStringSubmatch(jComment.Body)
-
-	if fields[5] == ghComment.GetBody() {
+	if jComment.Body == ghComment.GetBody() {
 		return nil
 	}
 

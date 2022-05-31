@@ -486,6 +486,9 @@ func (j dryrunJIRAClient) CreateIssue(issue jira.Issue) (jira.Issue, error) {
 	log.Info("Create new JIRA issue:")
 	log.Infof("  Summary: %s", fields.Summary)
 	log.Infof("  Description: %s", truncate(fields.Description, 50))
+	log.Infof("  Component: %v", fields.Components)
+	log.Infof("  GitHub Repo: %s", fields.Unknowns[j.config.GetFieldKey(cfg.GitHubRepository)])
+	log.Infof("  GitHub URL: %s", fields.Unknowns[j.config.GetFieldKey(cfg.GitHubURL)])
 	log.Infof("  GitHub ID: %d", fields.Unknowns[j.config.GetFieldKey(cfg.GitHubID)])
 	log.Infof("  GitHub Number: %d", fields.Unknowns[j.config.GetFieldKey(cfg.GitHubNumber)])
 	log.Infof("  Labels: %s", fields.Unknowns[j.config.GetFieldKey(cfg.GitHubLabels)])
@@ -507,6 +510,7 @@ func (j dryrunJIRAClient) UpdateIssue(issue jira.Issue) (jira.Issue, error) {
 	log.Info("")
 	log.Infof("Update JIRA issue %s:", issue.Key)
 	log.Infof("  Summary: %s", fields.Summary)
+	log.Infof("  Component: %v", fields.Components)
 	log.Infof("  Description: %s", truncate(fields.Description, 50))
 	key := j.config.GetFieldKey(cfg.GitHubLabels)
 	if labels, err := fields.Unknowns.String(key); err == nil {

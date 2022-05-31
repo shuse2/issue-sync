@@ -75,8 +75,9 @@ func DidIssueChange(config cfg.Config, ghIssue github.Issue, jIssue jira.Issue) 
 
 	anyDifferent := false
 
+	body := updateBody(ghIssue.GetBody())
 	anyDifferent = anyDifferent || (ghIssue.GetTitle() != jIssue.Fields.Summary)
-	anyDifferent = anyDifferent || (ghIssue.GetBody() != jIssue.Fields.Description)
+	anyDifferent = anyDifferent || (body != jIssue.Fields.Description)
 
 	key := config.GetFieldKey(cfg.GitHubStatus)
 	field, err := jIssue.Fields.Unknowns.String(key)
@@ -121,7 +122,8 @@ func UpdateIssue(config cfg.Config, ghIssue github.Issue, jIssue jira.Issue, ghC
 		fields.Unknowns = map[string]interface{}{}
 
 		fields.Summary = ghIssue.GetTitle()
-		fields.Description = ghIssue.GetBody()
+		body := updateBody(ghIssue.GetBody())
+		fields.Description = body
 		fields.Unknowns[config.GetFieldKey(cfg.GitHubStatus)] = ghIssue.GetState()
 		fields.Unknowns[config.GetFieldKey(cfg.GitHubReporter)] = ghIssue.User.GetLogin()
 
@@ -172,20 +174,24 @@ func CreateIssue(config cfg.Config, issue github.Issue, ghClient clients.GitHubC
 
 	log.Debugf("Creating JIRA issue based on GitHub issue #%d", *issue.Number)
 
+	body := updateBody(issue.GetBody())
 	fields := jira.IssueFields{
 		Type: jira.IssueType{
-			Name: "Task", // TODO: Determine issue type
+			Name: "Story", // TODO: Determine issue type
 		},
 		Project:     config.GetProject(),
 		Summary:     issue.GetTitle(),
-		Description: issue.GetBody(),
+		Description: body,
 		Unknowns:    map[string]interface{}{},
 	}
 
+	_, repo := config.GetRepo()
+	fields.Unknowns[config.GetFieldKey(cfg.GitHubRepository)] = repo
 	fields.Unknowns[config.GetFieldKey(cfg.GitHubID)] = issue.GetID()
 	fields.Unknowns[config.GetFieldKey(cfg.GitHubNumber)] = issue.GetNumber()
 	fields.Unknowns[config.GetFieldKey(cfg.GitHubStatus)] = issue.GetState()
 	fields.Unknowns[config.GetFieldKey(cfg.GitHubReporter)] = issue.User.GetLogin()
+	fields.Unknowns[config.GetFieldKey(cfg.GitHubURL)] = issue.GetHTMLURL()
 
 	strs := make([]string, len(issue.Labels))
 	for i, v := range issue.Labels {
@@ -216,4 +222,13 @@ func CreateIssue(config cfg.Config, issue github.Issue, ghClient clients.GitHubC
 	}
 
 	return nil
+}
+
+func updateBody(val string) string {
+	result := val
+	result = strings.ReplaceAll(result, "####", "h4.")
+	result = strings.ReplaceAll(result, "###", "h3.")
+	result = strings.ReplaceAll(result, "##", "h2.")
+	result = strings.ReplaceAll(result, "```", "{noformat}")
+	return result
 }
