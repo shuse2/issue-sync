@@ -193,6 +193,15 @@ func CreateIssue(config cfg.Config, issue github.Issue, ghClient clients.GitHubC
 	fields.Unknowns[config.GetFieldKey(cfg.GitHubReporter)] = issue.User.GetLogin()
 	fields.Unknowns[config.GetFieldKey(cfg.GitHubURL)] = issue.GetHTMLURL()
 
+	if componentID, ok := config.GetComponentID(repo); ok {
+		fields.Components = []*jira.Component{
+			{
+				ID:   componentID,
+				Name: repo,
+			},
+		}
+	}
+
 	strs := make([]string, len(issue.Labels))
 	for i, v := range issue.Labels {
 		strs[i] = *v.Name

@@ -68,6 +68,9 @@ type Config struct {
 	// fieldIDs is the list of custom fields we pulled from the `fields` JIRA endpoint.
 	fieldIDs fields
 
+	// components holds all components for the project
+	compoenents compoenents
+
 	// project represents the JIRA project the user has requested.
 	project jira.Project
 
@@ -121,6 +124,10 @@ func (c *Config) LoadJIRAConfig(client jira.Client) error {
 	c.project = *proj
 
 	c.fieldIDs, err = c.getFieldIDs(client)
+	if err != nil {
+		return err
+	}
+	c.compoenents, err = c.getComponents(client)
 	if err != nil {
 		return err
 	}
@@ -219,6 +226,11 @@ func (c Config) GetRepo() (string, string) {
 	parts := strings.Split(fullName, "/")
 	// We check that repo-name is two parts separated by a slash in NewConfig, so this is safe
 	return parts[0], parts[1]
+}
+
+func (c Config) GetComponentID(name string) (string, bool) {
+	component, ok := c.compoenents.GetComponent(name)
+	return component.ID, ok
 }
 
 // SetJIRAToken adds the JIRA OAuth tokens in the Viper configuration, ensuring that they
@@ -455,6 +467,11 @@ type jiraField struct {
 	} `json:"schema,omitempty"`
 }
 
+type jiraComponent struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 // getFieldIDs requests the metadata of every issue field in the JIRA
 // project, and saves the IDs of the custom fields used by issue-sync.
 func (c Config) getFieldIDs(client jira.Client) (fields, error) {
@@ -514,4 +531,35 @@ func (c Config) getFieldIDs(client jira.Client) (fields, error) {
 	c.log.Debug("All fields have been checked.")
 
 	return fieldIDs, nil
+}
+
+type compoenents []jiraComponent
+
+func (c compoenents) GetComponent(name string) (jiraComponent, bool) {
+	for _, comp := range c {
+		if comp.Name == name {
+			return comp, true
+		}
+	}
+	return jiraComponent{}, false
+}
+
+// getFieldIDs requests the metadata of every issue field in the JIRA
+// project, and saves the IDs of the custom fields used by issue-sync.
+func (c Config) getComponents(client jira.Client) (compoenents, error) {
+	c.log.Debug("Collecting component IDs.")
+	req, err := client.NewRequest("GET", fmt.Sprintf("/rest/api/2/project/%s/components", c.GetProjectKey()), nil)
+	if err != nil {
+		return compoenents{}, err
+	}
+	result := new([]jiraComponent)
+
+	_, err = client.Do(req, result)
+	if err != nil {
+		return compoenents{}, err
+	}
+
+	c.log.Debug("All fields have been checked.")
+
+	return *result, nil
 }
