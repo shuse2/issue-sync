@@ -38,6 +38,7 @@ const (
 	LastISUpdate     fieldKey = iota
 	GitHubRepository fieldKey = iota
 	GitHubURL        fieldKey = iota
+	EpicName         fieldKey = iota
 )
 
 // fields represents the custom field IDs of the JIRA custom fields we care about
@@ -50,6 +51,7 @@ type fields struct {
 	lastUpdate       string
 	githubRepository string
 	githubURL        string
+	epicName         string
 }
 
 // Config is the root configuration object the application creates.
@@ -200,6 +202,8 @@ func (c Config) GetFieldID(key fieldKey) string {
 		return c.fieldIDs.githubRepository
 	case GitHubURL:
 		return c.fieldIDs.githubURL
+	case EpicName:
+		return c.fieldIDs.epicName
 	default:
 		return ""
 	}
@@ -507,6 +511,8 @@ func (c Config) getFieldIDs(client jira.Client) (fields, error) {
 			fieldIDs.githubRepository = fmt.Sprint(field.Schema.CustomID)
 		case "GitHub URL":
 			fieldIDs.githubURL = fmt.Sprint(field.Schema.CustomID)
+		case "Epic Name":
+			fieldIDs.epicName = fmt.Sprint(field.Schema.CustomID)
 		}
 	}
 
@@ -526,6 +532,8 @@ func (c Config) getFieldIDs(client jira.Client) (fields, error) {
 		return fieldIDs, errors.New("could not find ID of 'Github Repository' custom field; check that it is named correctly")
 	} else if fieldIDs.githubURL == "" {
 		return fieldIDs, errors.New("could not find ID of 'Github URL' custom field; check that it is named correctly")
+	} else if fieldIDs.epicName == "" {
+		return fieldIDs, errors.New("could not find ID of 'Epic Name' custom field; check that it is named correctly")
 	}
 
 	c.log.Debug("All fields have been checked.")
