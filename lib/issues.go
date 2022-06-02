@@ -174,14 +174,23 @@ func CreateIssue(config cfg.Config, issue github.Issue, ghClient clients.GitHubC
 
 	log.Debugf("Creating JIRA issue based on GitHub issue #%d", *issue.Number)
 
+	issyeType := "Story"
+	for _, label := range issue.Labels {
+		if strings.Contains(label.GetName(), "epic") {
+			issyeType = "Epic"
+			break
+		}
+	}
+
 	body := updateBody(issue.GetBody())
 	fields := jira.IssueFields{
 		Type: jira.IssueType{
-			Name: "Story", // TODO: Determine issue type
+			Name: issyeType,
 		},
 		Project:     config.GetProject(),
 		Summary:     issue.GetTitle(),
 		Description: body,
+		Labels:      []string{"Development", "Github"},
 		Unknowns:    map[string]interface{}{},
 	}
 
