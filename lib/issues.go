@@ -180,6 +180,10 @@ func CreateIssue(config cfg.Config, issue github.Issue, ghClient clients.GitHubC
 			issueType = "Epic"
 			break
 		}
+		if strings.Contains(label.GetName(), "bug") {
+			issueType = "Bug"
+			break
+		}
 	}
 
 	body := updateBody(issue.GetBody())
