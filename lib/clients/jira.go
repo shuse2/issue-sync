@@ -277,57 +277,58 @@ func (j realJIRAClient) CreateComment(issue jira.Issue, comment github.IssueComm
 // JIRA with a new body from the fields of the given GitHub comment. It returns
 // the updated comment.
 func (j realJIRAClient) UpdateComment(issue jira.Issue, id string, comment github.IssueComment, github GitHubClient) (jira.Comment, error) {
-	log := j.config.GetLogger()
+	return jira.Comment{}, fmt.Errorf("Update JIRA comment failed: the update is currently not implemented")
+	// log := j.config.GetLogger()
 
-	user, err := github.GetUser(comment.User.GetLogin())
-	if err != nil {
-		return jira.Comment{}, err
-	}
+	// user, err := github.GetUser(comment.User.GetLogin())
+	// if err != nil {
+	// 	return jira.Comment{}, err
+	// }
 
-	body := fmt.Sprintf("Comment [(ID %d)|%s]", comment.GetID(), comment.GetHTMLURL())
-	body = fmt.Sprintf("%s from GitHub user [%s|%s]", body, user.GetLogin(), user.GetHTMLURL())
-	if user.GetName() != "" {
-		body = fmt.Sprintf("%s (%s)", body, user.GetName())
-	}
-	body = fmt.Sprintf(
-		"%s at %s:\n\n%s",
-		body,
-		comment.CreatedAt.Format(commentDateFormat),
-		comment.GetBody(),
-	)
+	// body := fmt.Sprintf("Comment [(ID %d)|%s]", comment.GetID(), comment.GetHTMLURL())
+	// body = fmt.Sprintf("%s from GitHub user [%s|%s]", body, user.GetLogin(), user.GetHTMLURL())
+	// if user.GetName() != "" {
+	// 	body = fmt.Sprintf("%s (%s)", body, user.GetName())
+	// }
+	// body = fmt.Sprintf(
+	// 	"%s at %s:\n\n%s",
+	// 	body,
+	// 	comment.CreatedAt.Format(commentDateFormat),
+	// 	comment.GetBody(),
+	// )
 
-	if len(body) > maxBodyLength {
-		body = body[:maxBodyLength]
-	}
+	// if len(body) > maxBodyLength {
+	// 	body = body[:maxBodyLength]
+	// }
 
-	// As it is, the JIRA API we're using doesn't have any way to update comments natively.
-	// So, we have to build the request ourselves.
-	request := struct {
-		Body string `json:"body"`
-	}{
-		Body: body,
-	}
+	// // As it is, the JIRA API we're using doesn't have any way to update comments natively.
+	// // So, we have to build the request ourselves.
+	// request := struct {
+	// 	Body string `json:"body"`
+	// }{
+	// 	Body: body,
+	// }
 
-	req, err := j.client.NewRequest("PUT", fmt.Sprintf("rest/api/2/issue/%s/comment/%s", issue.Key, id), request)
-	if err != nil {
-		log.Errorf("Error creating comment update request: %s", err)
-		return jira.Comment{}, err
-	}
+	// req, err := j.client.NewRequest("PUT", fmt.Sprintf("rest/api/2/issue/%s/comment/%s", issue.Key, id), request)
+	// if err != nil {
+	// 	log.Errorf("Error creating comment update request: %s", err)
+	// 	return jira.Comment{}, err
+	// }
 
-	com, res, err := j.request(func() (interface{}, *jira.Response, error) {
-		res, err := j.client.Do(req, nil)
-		return nil, res, err
-	})
-	if err != nil {
-		log.Errorf("Error updating comment: %v", err)
-		return jira.Comment{}, getErrorBody(j.config, res)
-	}
-	co, ok := com.(*jira.Comment)
-	if !ok {
-		log.Errorf("Update JIRA comment did not return comment! Got: %v", com)
-		return jira.Comment{}, fmt.Errorf("Update JIRA comment failed: expected *jira.Comment; got %T", com)
-	}
-	return *co, nil
+	// com, res, err := j.request(func() (interface{}, *jira.Response, error) {
+	// 	res, err := j.client.Do(req, nil)
+	// 	return nil, res, err
+	// })
+	// if err != nil {
+	// 	log.Errorf("Error updating comment: %v", err)
+	// 	return jira.Comment{}, getErrorBody(j.config, res)
+	// }
+	// co, ok := com.(*jira.Comment)
+	// if !ok {
+	// 	log.Errorf("Update JIRA comment did not return comment! Got: %v", com)
+	// 	return jira.Comment{}, fmt.Errorf("Update JIRA comment failed: expected *jira.Comment; got %T", com)
+	// }
+	// return *co, nil
 }
 
 // request takes an API function from the JIRA library
