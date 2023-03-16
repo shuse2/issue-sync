@@ -210,14 +210,14 @@ func CreateIssue(config cfg.Config, issue github.Issue, ghClient clients.GitHubC
 	fields.Unknowns[config.GetFieldKey(cfg.GitHubURL)] = issue.GetHTMLURL()
 
 	// Skip updating component
-	// if componentID, ok := config.GetComponentID(repo); ok {
-	// 	fields.Components = []*jira.Component{
-	// 		{
-	// 			ID:   componentID,
-	// 			Name: repo,
-	// 		},
-	// 	}
-	// }
+	if componentID, ok := config.GetComponentID(repo); ok {
+		fields.Components = []*jira.Component{
+			{
+				ID:   componentID,
+				Name: repo,
+			},
+		}
+	}
 
 	strs := make([]string, len(issue.Labels))
 	for i, v := range issue.Labels {
